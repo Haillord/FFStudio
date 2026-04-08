@@ -7,14 +7,16 @@
 <img src="https://readme-typing-svg.demolab.com?font=Share+Tech+Mono&size=20&pause=2000&color=1A6BFF&center=true&vCenter=true&width=700&height=45&duration=40&lines=FFStudio+%E2%80%94+FFmpeg+GUI;React+%2B+Tauri+(Rust)+desktop+app;Convert+%E2%80%A2+Trim+%E2%80%A2+Resize+%E2%80%A2+Extract;No+terminal+required">
 </p>
 
-<p align="center">
-  <img src="banner.svg" width="100%" alt="FFStudio Banner">
-</p>
+
 
 <p align="center">
   <img src="https://img.shields.io/github/license/yourname/ffstudio?style=for-the-badge&label=LICENSE&color=1A6BFF&labelColor=0a0a0f" alt="license">
   <img src="https://img.shields.io/github/stars/yourname/ffstudio?style=for-the-badge&label=STARS&color=1A6BFF&labelColor=0a0a0f" alt="stars">
   <img src="https://img.shields.io/badge/STATUS-ACTIVE-1A6BFF?style=for-the-badge&labelColor=0a0a0f" alt="status">
+</p>
+
+<p align="center">
+  <img src="banner.svg" width="100%" alt="FFStudio Banner">
 </p>
 
 ---
