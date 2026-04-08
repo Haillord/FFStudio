@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.webp" alt="FFStudio" width="500">
+  <img src="icon.webp" alt="FFStudio" width="1200">
 </p>
 
 <p align="center">
