@@ -2,12 +2,13 @@
   <img src="icon.webp" alt="FFStudio" width="1200">
 </p>
 
-<p align="center">
-  <img src="banner.svg" width="100%" alt="FFStudio Banner">
-</p>
 
 <p align="center">
 <img src="https://readme-typing-svg.demolab.com?font=Share+Tech+Mono&size=20&pause=2000&color=1A6BFF&center=true&vCenter=true&width=700&height=45&duration=40&lines=FFStudio+%E2%80%94+FFmpeg+GUI;React+%2B+Tauri+(Rust)+desktop+app;Convert+%E2%80%A2+Trim+%E2%80%A2+Resize+%E2%80%A2+Extract;No+terminal+required">
+</p>
+
+<p align="center">
+  <img src="banner.svg" width="100%" alt="FFStudio Banner">
 </p>
 
 <p align="center">
