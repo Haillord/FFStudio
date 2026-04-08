@@ -29,6 +29,32 @@
 
 <br>
 
+## 📸 Скриншоты
+
+<p align="center">
+  <kbd>
+    <img src="screen5.png" width="90%" alt="FFStudio Главный экран"/>
+  </kbd>
+</p>
+
+<details>
+<summary>🔍 Ещё скриншоты</summary>
+<br>
+
+<p align="center">
+  <img src="screen1.png" width="80%"/>
+  <br><br>
+  <img src="screen2.png" width="80%"/>
+  <br><br>
+  <img src="screen3.png" width="80%"/>
+  <br><br>
+  <img src="screen4.png" width="80%"/>
+</p>
+
+</details>
+
+<br>
+
 ---
 
 <table>
