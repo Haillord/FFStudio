@@ -77,12 +77,6 @@
 Конвертация, обрезка, изменение размера и извлечение аудио
 </td>
 <td>
-<img src="https://img.shields.io/badge/Cross_Platform-533AB7?style=flat-square&logoColor=white"/>
-
-Работает на Windows, macOS и Linux
-</td>
-</tr>
-</table>
 
 ---
 
