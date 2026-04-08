@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.webp" alt="FFStudio" width="1200">
+  <img src="icon.webp" alt="FFStudio" width="1000">
 </p>
 
 
@@ -62,17 +62,17 @@
 <td width="33%">
 <img src="https://img.shields.io/badge/React_+_Tauri-1A6BFF?style=flat-square&logoColor=white"/>
 
-Нативное десктопное приложение на Rust
+Нативное приложение
 </td>
 <td width="33%">
 <img src="https://img.shields.io/badge/No_Terminal-007808?style=flat-square&logoColor=white"/>
 
-Без команд в консоли
+Без консоли
 </td>
 <td width="33%">
 <img src="https://img.shields.io/badge/Video_Processing-BA7517?style=flat-square&logoColor=white"/>
 
-Все основные функции
+Конвертация, обрезка
 </td>
 </tr>
 </table>
