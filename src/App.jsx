@@ -12,6 +12,7 @@ import Settings from './components/Settings'
 import TrimTab from './components/TrimTab'
 import MergeTab from './components/MergeTab'
 import FramesTab from './components/FramesTab'
+import DownloadTab from './components/DownloadTab'
 
 // ─── Global progress store ────────────────────────────────────────────────────
 // Shared across tabs so BatchTab can show progress of any job
@@ -65,6 +66,7 @@ export default function App() {
     trim: 'Обрезка видео',
     merge: 'Склейка файлов',
     thumb: 'Извлечение кадров',
+    download: 'Скачать видео',
     settings: 'Настройки',
   }
 
@@ -95,6 +97,7 @@ export default function App() {
 
         {/* Stubs for future tabs */}
         {tab === 'thumb' && <FramesTab settings={settings} />}
+        {tab === 'download' && <DownloadTab />}
       </div>
     </div>
   )

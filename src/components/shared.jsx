@@ -229,7 +229,7 @@ export function FileDropZone({ file, onPick, onClear, onDropPath, accept }) {
       ) : (
         <>
           <div className="drop-zone-icon">📂</div>
-          <div className="drop-zone-title">Выберите файл или перетащите</div>
+          <div className="drop-zone-title">Выберите файл</div>
           <div className="drop-zone-sub">{accept}</div>
         </>
       )}

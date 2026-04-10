@@ -137,7 +137,7 @@ export default function BatchTab({ settings }) {
         </div>
         {queue.length === 0 ? (
           <div style={{ padding: '28px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13 }}>
-            Нет файлов. Нажмите «Добавить» или перетащите файлы.
+            Нет файлов. Нажмите «Добавить».
           </div>
         ) : (
           queue.map(item => (

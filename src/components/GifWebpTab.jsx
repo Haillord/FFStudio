@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { invoke } from '@tauri-apps/api/core'
 import {
   useFile, useConvert, saveOutput,
   Chip, SelectRow, ToggleRow, SliderRow,
@@ -27,6 +28,8 @@ export default function GifWebpTab({ settings }) {
   const [startTime, setStart]   = useState(0)
   const [duration, setDuration] = useState(0)
   const [optimize, setOptimize] = useState(true)
+  const [previewSrc, setPreviewSrc] = useState(null)
+  const [previewLoading, setPreviewLoading] = useState(false)
 
   const ffArgs = useMemo(() => {
     const args = []
@@ -45,15 +48,12 @@ export default function GifWebpTab({ settings }) {
       const trimFilter = getTrimFilter()
       const scaleFilter = `fps=${gifFps},scale=${width}:-1:flags=lanczos`
       if (pingPong) {
-        args.push('-vf',
-          `${trimFilter}${scaleFilter},split[v1][v2];[v2]reverse[rv];[v1][rv]concat=n=2:v=1,split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse=dither=${dither}`)
+        args.push('-vf', `${trimFilter}${scaleFilter},split[v1][v2];[v2]reverse[rv];[v1][rv]concat=n=2:v=1,split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse=dither=${dither}`)
       } else {
-        args.push('-vf',
-          `${trimFilter}${scaleFilter},split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse=dither=${dither}`)
+        args.push('-vf', `${trimFilter}${scaleFilter},split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse=dither=${dither}`)
       }
       if (loop) args.push('-loop', '0')
       else args.push('-loop', '-1')
-
     } else if (fmt === 'WebP') {
       const trimFilter = getTrimFilter()
       const scaleFilter = `fps=${gifFps},scale=${width}:-1:flags=lanczos`
@@ -67,7 +67,6 @@ export default function GifWebpTab({ settings }) {
       args.push('-preset', 'default')
       args.push('-loop', loop ? '0' : '1')
       if (optimize) args.push('-compression_level', '6')
-
     } else if (fmt === 'APNG') {
       const trimFilter = getTrimFilter()
       const scaleFilter = `fps=${gifFps},scale=${width}:-1:flags=lanczos`
@@ -82,6 +81,27 @@ export default function GifWebpTab({ settings }) {
 
     return args
   }, [fmt, gifFps, width, quality, loop, pingPong, dither, startTime, duration, optimize])
+
+  const handlePreview = async () => {
+    if (!file) return
+    setPreviewLoading(true)
+    try {
+      const previewTime = startTime > 0 ? startTime : 0
+      const vfIndex = ffArgs.indexOf('-vf')
+      // Для предпросмотра берём только scale фильтр без палитры и реверса
+      const vfString = `scale=${width}:-1:flags=lanczos`
+      const tmpPath = await invoke('preview_frame', {
+        input: file.path,
+        time: previewTime,
+        vfArgs: vfString,
+      })
+      const base64 = await invoke('read_file_base64', { path: tmpPath })
+      setPreviewSrc(`data:image/jpeg;base64,${base64}`)
+    } catch (e) {
+      console.error(e)
+    }
+    setPreviewLoading(false)
+  }
 
   const cmd = useMemo(() => {
     if (!file) return 'ffmpeg -i input.mp4 ...'
@@ -105,6 +125,39 @@ export default function GifWebpTab({ settings }) {
         onDropPath={loadFileInfo}
         accept="MP4, MKV, MOV, WebM или существующий GIF для перекодирования"
       />
+
+      {file && (
+        <div className="card">
+          <div className="card-header">
+            <span className="card-title">Предпросмотр кадра</span>
+            <button
+              className="btn btn-secondary"
+              style={{ fontSize: 12 }}
+              onClick={handlePreview}
+              disabled={previewLoading}
+            >
+              {previewLoading ? '⏳ Загрузка...' : '👁 Показать'}
+            </button>
+          </div>
+          {previewSrc && (
+            <div style={{ padding: '8px 16px 16px' }}>
+              <img
+                src={previewSrc}
+                alt="preview"
+                style={{
+                  width: '100%',
+                  maxHeight: '300px',
+                  objectFit: 'contain',
+                  borderRadius: 8,
+                  border: '1px solid var(--border)',
+                  display: 'block',
+                  margin: '0 auto'
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="card">
         <div className="card-header"><span className="card-title">Формат</span></div>

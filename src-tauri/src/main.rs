@@ -304,6 +304,32 @@ async fn preview_frame(app: tauri::AppHandle, input: String, time: f64, vf_args:
     }
 }
 
+#[tauri::command]
+async fn run_ytdlp(url: String, format: String, output_dir: Option<String>) -> Result<String, String> {
+    let output_path = if let Some(dir) = output_dir {
+        format!("{}\\%(title)s.%(ext)s", dir)
+    } else {
+        format!("{}\\%(title)s.%(ext)s", std::env::var("USERPROFILE").unwrap_or(".".to_string()) + "\\Downloads")
+    };
+
+    let output = Command::new("yt-dlp")
+        .arg("--no-playlist")
+        .arg("-f").arg(format)
+        .arg("-o").arg(output_path)
+        .arg(&url)
+        .output()
+        .map_err(|e| format!("yt-dlp не найден: {}", e))?;
+
+    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+    let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+
+    if output.status.success() {
+        Ok(format!("✅ Готово!\n{}", stdout))
+    } else {
+        Err(format!("❌ Ошибка:\n{}", stderr))
+    }
+}
+
 async fn run_ffmpeg(
     mut cmd: Command,
     job_id: String,
@@ -392,6 +418,7 @@ fn main() {
             write_temp_list,
             preview_frame,
             read_file_base64,
+            run_ytdlp,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

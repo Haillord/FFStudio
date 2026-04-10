@@ -27,6 +27,7 @@ export default function Sidebar({ tab, setTab, ffmpegOk, jobs }) {
       <NavItem id="trim"  icon="✂️" label="Обрезка"  color="#FFF0F0" tab={tab} setTab={setTab} />
       <NavItem id="merge" icon="🔗" label="Склейка"  color="#E0F0FF" tab={tab} setTab={setTab} />
       <NavItem id="thumb" icon="🖼️" label="Кадры"   color="#FFFAE0" tab={tab} setTab={setTab} />
+      <NavItem id="download" icon="⬇️" label="Скачать" color="#E5F8EE" tab={tab} setTab={setTab} />
 
       <div className="sidebar-spacer" />
 

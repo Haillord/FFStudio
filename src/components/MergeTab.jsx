@@ -132,7 +132,7 @@ export default function MergeTab({ settings }) {
         onPick={pickFiles}
         onClear={clearAll}
         onDropPath={handleDropPath}
-        accept="Выберите или перетащите видео файлы (можно несколько)"
+        accept="Выберите видео файлы (можно несколько)"
       />
 
       {files.length > 0 && (

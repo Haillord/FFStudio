@@ -29,6 +29,8 @@ export default function FramesTab({ settings }) {
   const [quality, setQuality]   = useState(90)
   const [outputDir, setOutputDir] = useState('')
   const [scale, setScale]       = useState('original')
+  const [previewSrc, setPreviewSrc] = useState(null)
+  const [previewLoading, setPreviewLoading] = useState(false)
 
   const duration = file?.info?.duration ?? 0
 
@@ -41,6 +43,24 @@ export default function FramesTab({ settings }) {
   const pickOutputDir = async () => {
     const dir = await open({ directory: true, multiple: false })
     if (dir) setOutputDir(typeof dir === 'string' ? dir : dir[0])
+  }
+
+  const handlePreview = async () => {
+    if (!file) return
+    setPreviewLoading(true)
+    try {
+      const vfString = scale !== 'original' ? `scale=${scale}:-1` : ''
+      const tmpPath = await invoke('preview_frame', {
+        input: file.path,
+        time: timeAt,
+        vfArgs: vfString,
+      })
+      const base64 = await invoke('read_file_base64', { path: tmpPath })
+      setPreviewSrc(`data:image/jpeg;base64,${base64}`)
+    } catch (e) {
+      console.error(e)
+    }
+    setPreviewLoading(false)
   }
 
   const ffArgs = useMemo(() => {
@@ -153,7 +173,19 @@ export default function FramesTab({ settings }) {
 
       {mode === 'single' && (
         <div className="card">
-          <div className="card-header"><span className="card-title">Момент времени</span></div>
+          <div className="card-header">
+            <span className="card-title">Момент времени</span>
+            {file && (
+              <button
+                className="btn btn-secondary"
+                style={{ fontSize: 12 }}
+                onClick={handlePreview}
+                disabled={previewLoading}
+              >
+                {previewLoading ? '⏳ Загрузка...' : '👁 Предпросмотр'}
+              </button>
+            )}
+          </div>
           <div className="row">
             <div>
               <div className="row-label">Время (сек)</div>
@@ -180,6 +212,23 @@ export default function FramesTab({ settings }) {
               />
             </div>
           </div>
+          {previewSrc && (
+            <div style={{ padding: '0 16px 16px' }}>
+              <img
+                src={previewSrc}
+                alt="preview"
+                style={{
+                  width: '100%',
+                  maxHeight: '350px',
+                  objectFit: 'contain',
+                  borderRadius: 8,
+                  border: '1px solid var(--border)',
+                  display: 'block',
+                  margin: '0 auto'
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 

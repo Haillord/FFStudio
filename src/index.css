@@ -435,6 +435,7 @@ html, body, #root {
   background: var(--bg-card); /* явный фон, чтобы перекрывать соседей */
   position: relative;
   z-index: 1;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .card-header.clickable {
@@ -469,6 +470,7 @@ html, body, #root {
   position: relative;
   z-index: 0;
   background: var(--bg-card);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
 .card-content.open {

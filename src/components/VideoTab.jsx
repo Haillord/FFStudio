@@ -155,9 +155,10 @@ export default function VideoTab({ settings }) {
     if (!file) return
     setPreviewLoading(true)
     try {
-      const vfString = vertical 
-        ? `crop=ih*9/16:ih:(iw-ih*9/16)/2+iw*${cropOffset}/100:0`
-        : ''
+      // Берём vf фильтры из ffArgs
+      const vfIndex = ffArgs.indexOf('-vf')
+      const vfString = vfIndex !== -1 ? ffArgs[vfIndex + 1] : ''
+      
       const tmpPath = await invoke('preview_frame', {
         input: file.path,
         time: previewTime,
@@ -238,11 +239,13 @@ export default function VideoTab({ settings }) {
           style={{ 
             width: vertical ? 'auto' : '100%',
             height: vertical ? '400px' : 'auto',
+            maxHeight: '400px',
             maxWidth: '100%',
             borderRadius: 8,
             border: '1px solid var(--border)',
             display: 'block',
-            margin: '0 auto'
+            margin: '0 auto',
+            objectFit: 'contain'
           }} 
         />
             </div>
