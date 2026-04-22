@@ -4,7 +4,7 @@
 
 
 <p align="center">
-<img src="https://readme-typing-svg.demolab.com?font=Share+Tech+Mono&size=20&pause=2000&color=1A6BFF&center=true&vCenter=true&width=700&height=45&duration=40&lines=FFStudio+%E2%80%94+FFmpeg+GUI;React+%2B+Tauri+(Rust)+desktop+app;Convert+%E2%80%A2+Trim+%E2%80%A2+Resize+%E2%80%A2+Extract;No+terminal+required">
+<img src="https://readme-typing-svg.demolab.com?font=Share+Tech+Mono&size=20&pause=2000&color=1A6BFF&center=true&vCenter=true&width=700&height=45&duration=40&lines=FFStudio+%E2%80%94+AI+%2B+FFmpeg+GUI;React+%2B+Tauri+(Rust)+desktop+app;Конвертация+%E2%80%A2+ИИ+%E2%80%A2+Генерация;Всё+в+одном+окне">
 </p>
 
 
@@ -29,50 +29,29 @@
 
 <br>
 
-## 📸 Скриншоты
-
-<p align="center">
-  <kbd>
-    <img src="screen5.png" width="90%" alt="FFStudio Главный экран"/>
-  </kbd>
-</p>
-
-<details>
-<summary>🔍 Ещё скриншоты</summary>
-<br>
-
-<p align="center">
-  <img src="screen1.png" width="80%"/>
-  <br><br>
-  <img src="screen2.png" width="80%"/>
-  <br><br>
-  <img src="screen3.png" width="80%"/>
-  <br><br>
-  <img src="screen4.png" width="80%"/>
-</p>
-
-</details>
-
-<br>
-
 ---
 
 <table>
 <tr>
-<td width="33%">
+<td width="25%">
 <img src="https://img.shields.io/badge/React_+_Tauri-1A6BFF?style=flat-square&logoColor=white"/>
 
 Нативное приложение
 </td>
-<td width="33%">
-<img src="https://img.shields.io/badge/No_Terminal-007808?style=flat-square&logoColor=white"/>
+<td width="25%">
+<img src="https://img.shields.io/badge/FFmpeg-007808?style=flat-square&logoColor=white"/>
+
+Видео/аудио
+</td>
+<td width="25%">
+<img src="https://img.shields.io/badge/AI_Models-9333EA?style=flat-square&logoColor=white"/>
+
+Локальные ИИ
+</td>
+<td width="25%">
+<img src="https://img.shields.io/badge/No_Terminal-FF6B00?style=flat-square&logoColor=white"/>
 
 Без консоли
-</td>
-<td width="33%">
-<img src="https://img.shields.io/badge/Video_Processing-BA7517?style=flat-square&logoColor=white"/>
-
-Конвертация, обрезка
 </td>
 </tr>
 </table>
@@ -87,13 +66,15 @@
   <img src="https://img.shields.io/badge/Tauri-FFC131?style=for-the-badge&logo=tauri&logoColor=black"/>
   <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white"/>
   <img src="https://img.shields.io/badge/FFmpeg-007808?style=for-the-badge&logo=ffmpeg&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Stable_Diffusion-000000?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Whisper-000000?style=for-the-badge"/>
 </p>
 
 ---
 
 ### ⚙️ Требования
 
-> Node.js `16+` &nbsp;•&nbsp; Rust `1.70+` &nbsp;•&nbsp; FFmpeg **вшит в приложение** — не требуется установка
+> Node.js `20+` &nbsp;•&nbsp; Rust `1.75+` &nbsp;•&nbsp; Все остальное автоматически скачивается при первом запуске
 
 ---
 
@@ -103,53 +84,77 @@
 # 1. Зависимости Node.js
 npm install
 
-# 2. Зависимости Rust
-cd src-tauri && cargo build
-
-# 3. Режим разработки
+# 2. Режим разработки
 npm run dev
 
-# 4. Сборка
+# 3. Сборка релизной версии
 npm run build
 ```
 
 ---
 
-### 📂 Структура
+### 🎬 Все возможности
 
-<details>
-<summary><b>Показать структуру проекта</b></summary>
-<br>
-<pre>
-ff-studio/
-├── src/                   - React-интерфейс
-│   ├── components/        - UI-компоненты
-│   ├── App.jsx            - корневой компонент
-│   └── index.css          - глобальные стили
-├── src-tauri/             - Rust / Tauri
-│   ├── src/main.rs        - точка входа
-│   ├── Cargo.toml         - зависимости Rust
-│   └── tauri.conf.json    - конфигурация Tauri
-├── ff/                    - FFmpeg-файлы
-├── dist/                  - сборка Vite
-└── package.json
-</pre>
-</details>
+#### 🎥 Видео
+- Конвертация между всеми форматами (MP4, MKV, WebM, MOV, AVI)
+- Обрезка по временным меткам
+- Изменение размера, кадрирование
+- Извлечение аудио дорожки
+- Извлечение кадров
+- Создание GIF / WebP / APNG анимации
+- Склейка файлов
+- Пакетная обработка
+
+#### 🎵 Аудио
+- Конвертация MP3, AAC, FLAC, WAV, Opus
+- Обрезка, нормализация громкости
+- Создание рингтонов
+
+#### 🤖 ИИ
+##### 🖼️ Изображения
+- ✅ Генерация изображений Stable Diffusion XL / Turbo
+- ✅ Inpaint / Outpaint
+- ✅ ControlNet
+- ✅ Интеграция с ComfyUI
+
+##### 🔊 Голос и звук
+- ✅ Текст в речь (больше 100 голосов)
+- ✅ Realtime голосовой чат
+- ✅ Распознавание речи OpenAI Whisper
+- ✅ Автоматическое создание субтитров
+- ✅ Генерация музыки и звуковых эффектов
+
+##### ✨ Дополнительно
+- ✅ Встроенный ИИ генератор промптов
+- ✅ Автоматическое улучшение запросов
+- ✅ Локальные модели, работает без интернета
+- ✅ Никаких API ключей не требуется
 
 ---
 
-### 🎬 Возможности
+### 📂 Актуальная структура проекта
 
-- 🎥 Конвертация видео между форматами (MP4, MKV, WebM, MOV, AVI и др.)
-- 🎵 Извлечение и конвертация аудио (MP3, AAC, FLAC, WAV, Opus и др.)
-- ✂️ Обрезка видео по временным меткам
-- 🔗 Склейка нескольких файлов
-- 🖼️ Извлечение кадров (PNG, JPG, WebP)
-- 🌀 GIF / WebP / APNG анимация с ping-pong эффектом
-- 📱 Кадрирование для вертикального видео (9:16) с предпросмотром
-- 📦 Пакетная обработка файлов
-- ⚡ FFmpeg вшит — просто скачай и запусти
-- 🖥️ Без терминала и установки зависимостей
+<details>
+<summary><b>Показать структуру</b></summary>
+<br>
+<pre>
+fg-studio/
+├── src/                   - React интерфейс
+│   ├── components/        - Все вкладки и UI компоненты
+│   ├── App.jsx
+│   └── index.css
+├── src-tauri/             - Rust бэкенд
+│   ├── src/
+│   │   ├── commands/      - Команды вызываемые из фронтенда
+│   │   ├── models/        - Реализации ИИ моделей
+│   │   ├── *_impl.rs      - Реализации движков
+│   │   └── main.rs
+│   ├── Cargo.toml
+│   └── tauri.conf.json
+├── ff/                    - Встроенный FFmpeg
+└── package.json
+</pre>
+</details>
 
 ---
 

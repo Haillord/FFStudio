@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import {
-  useFile, useConvert, saveOutput,
+  useFile, useConvert, useTabState, saveOutputUnique,
   Chip, SelectRow, ToggleRow, SliderRow,
-  ConvertFooter, CmdPreview, FileDropZone,
+  ConvertFooter, CmdPreview, FileDropZone, formatUserError, showErrorToast, PageHeader,
 } from './shared'
 
 const OUTPUT_FORMATS = ['GIF', 'WebP', 'APNG']
@@ -16,20 +16,29 @@ const DITHER_MODES = [
 
 export default function GifWebpTab({ settings }) {
   const { file, pickFile, loadFileInfo, clearFile } = useFile()
-  const { state, progress, speed, fps, error, run, reset } = useConvert()
+  const { state, progress, speed, fps, error, run, reset, cancel } = useConvert()
+  const { state: persistedGif, patchState: patchTabState } = useTabState('gif_webp', {
+    fmt: 'GIF', gifFps: 15, width: 480, quality: 85, loop: true, pingPong: false,
+    dither: 'bayer', startTime: 0, duration: 0, optimize: true,
+  })
 
-  const [fmt, setFmt]           = useState('GIF')
-  const [gifFps, setGifFps]     = useState(15)
-  const [width, setWidth]       = useState(480)
-  const [quality, setQuality]   = useState(85)
-  const [loop, setLoop]         = useState(true)
-  const [pingPong, setPingPong] = useState(false)
-  const [dither, setDither]     = useState('bayer')
-  const [startTime, setStart]   = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [optimize, setOptimize] = useState(true)
+  const [fmt, setFmt]           = useState(persistedGif.fmt)
+  const [gifFps, setGifFps]     = useState(persistedGif.gifFps)
+  const [width, setWidth]       = useState(persistedGif.width)
+  const [quality, setQuality]   = useState(persistedGif.quality)
+  const [loop, setLoop]         = useState(persistedGif.loop)
+  const [pingPong, setPingPong] = useState(persistedGif.pingPong)
+  const [dither, setDither]     = useState(persistedGif.dither)
+  const [startTime, setStart]   = useState(persistedGif.startTime)
+  const [duration, setDuration] = useState(persistedGif.duration)
+  const [optimize, setOptimize] = useState(persistedGif.optimize)
   const [previewSrc, setPreviewSrc] = useState(null)
   const [previewLoading, setPreviewLoading] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [advancedOpen, setAdvancedOpen] = useState(false)
+  useEffect(() => {
+    patchTabState({ fmt, gifFps, width, quality, loop, pingPong, dither, startTime, duration, optimize })
+  }, [fmt, gifFps, width, quality, loop, pingPong, dither, startTime, duration, optimize])
 
   const ffArgs = useMemo(() => {
     const args = []
@@ -98,7 +107,7 @@ export default function GifWebpTab({ settings }) {
       const base64 = await invoke('read_file_base64', { path: tmpPath })
       setPreviewSrc(`data:image/jpeg;base64,${base64}`)
     } catch (e) {
-      console.error(e)
+      showErrorToast(e, 'Не удалось подготовить предпросмотр')
     }
     setPreviewLoading(false)
   }
@@ -110,14 +119,32 @@ export default function GifWebpTab({ settings }) {
 
   const handleConvert = async () => {
     if (!file) return
+    if (duration < 0 || startTime < 0) {
+      showErrorToast('Время начала и длительность не могут быть отрицательными.')
+      return
+    }
+    if (gifFps < 5 || gifFps > 30) {
+      showErrorToast('FPS должен быть в диапазоне 5..30.')
+      return
+    }
     const ext = fmt.toLowerCase()
-    const outPath = await saveOutput(`output.${ext}`, [{ name: fmt, extensions: [ext] }])
+    const outPath = await saveOutputUnique({
+      defaultStem: 'anim',
+      extension: ext,
+      filters: [{ name: fmt, extensions: [ext] }],
+      targetDir: settings.outputDir || '',
+    })
     if (!outPath) return
-    run(file.path, outPath, ffArgs)
+    try {
+      await run(file.path, outPath, ffArgs)
+    } catch (e) {
+      showErrorToast(e, 'Не удалось запустить конвертацию')
+    }
   }
 
   return (
-    <div className="content">
+    <div className="content video-compact gif-compact">
+
       <FileDropZone
         file={file}
         onPick={() => pickFile([{ name: 'Видео', extensions: ['mp4','mkv','avi','mov','webm','gif'] }])}
@@ -128,34 +155,43 @@ export default function GifWebpTab({ settings }) {
 
       {file && (
         <div className="card">
-          <div className="card-header">
+          <div className="card-header clickable" onClick={() => setPreviewOpen(v => !v)}>
             <span className="card-title">Предпросмотр кадра</span>
-            <button
-              className="btn btn-secondary"
-              style={{ fontSize: 12 }}
-              onClick={handlePreview}
-              disabled={previewLoading}
-            >
-              {previewLoading ? '⏳ Загрузка...' : '👁 Показать'}
-            </button>
+            <span className={`card-toggle ${previewOpen ? 'open' : ''}`}>▼</span>
           </div>
-          {previewSrc && (
-            <div style={{ padding: '8px 16px 16px' }}>
-              <img
-                src={previewSrc}
-                alt="preview"
-                style={{
-                  width: '100%',
-                  maxHeight: '300px',
-                  objectFit: 'contain',
-                  borderRadius: 8,
-                  border: '1px solid var(--border)',
-                  display: 'block',
-                  margin: '0 auto'
-                }}
-              />
+          <div className={`card-content ${previewOpen ? 'open' : ''}`}>
+            <div className="row">
+              <div>
+                <div className="row-label">Кадр для предпросмотра</div>
+                <div className="row-hint">Показывает масштаб и пример качества</div>
+              </div>
+              <button
+                className="btn btn-secondary"
+                style={{ fontSize: 12 }}
+                onClick={handlePreview}
+                disabled={previewLoading}
+              >
+                {previewLoading ? 'Загрузка...' : 'Показать'}
+              </button>
             </div>
-          )}
+            {previewSrc && (
+              <div style={{ padding: '8px 16px 16px' }}>
+                <img
+                  src={previewSrc}
+                  alt="preview"
+                  style={{
+                    width: '100%',
+                    maxHeight: '300px',
+                    objectFit: 'contain',
+                    borderRadius: 8,
+                    border: '1px solid var(--border)',
+                    display: 'block',
+                    margin: '0 auto'
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -168,44 +204,52 @@ export default function GifWebpTab({ settings }) {
         </div>
       </div>
 
-      <div className="card">
-        <div className="card-header"><span className="card-title">Параметры анимации</span></div>
-        <SliderRow label="FPS" min={5} max={30} step={1} value={gifFps} onChange={setGifFps} />
-        <SliderRow label="Ширина (px)" hint="Высота рассчитывается автоматически"
-          min={100} max={1920} step={10} value={width} onChange={setWidth} unit="px" />
-        {fmt === 'WebP' && (
-          <SliderRow label="Качество" min={1} max={100} step={1} value={quality}
-            onChange={setQuality} unit="%" />
-        )}
-        <ToggleRow label="Зациклить анимацию" on={loop} onChange={setLoop} />
-        <ToggleRow label="Ping-pong (вперёд + назад)" hint="Анимация играет вперёд затем в обратную сторону"
-          on={pingPong} onChange={setPingPong} />
-      </div>
-
-      <div className="card">
-        <div className="card-header"><span className="card-title">Дополнительно</span></div>
-        {fmt === 'GIF' && (
-          <SelectRow label="Дизеринг (dither)" value={dither} onChange={setDither}
-            options={DITHER_MODES} />
-        )}
-        {fmt === 'WebP' && (
-          <ToggleRow label="Оптимизировать (compression 6)" on={optimize} onChange={setOptimize} />
-        )}
-        <div className="row">
-          <div>
-            <div className="row-label">Начало (сек)</div>
-            <div className="row-hint">0 = с начала</div>
-          </div>
-          <input type="number" className="ios-input" min={0} value={startTime}
-            onChange={e => setStart(Number(e.target.value))} />
+      <div className="two-col gif-main-cards">
+        <div className="card">
+          <div className="card-header"><span className="card-title">Параметры анимации</span></div>
+          <SliderRow label="FPS" min={5} max={30} step={1} value={gifFps} onChange={setGifFps} />
+          <SliderRow label="Ширина (px)" hint="Высота рассчитывается автоматически"
+            min={100} max={1920} step={10} value={width} onChange={setWidth} unit="px" />
+          {fmt === 'WebP' && (
+            <SliderRow label="Качество" min={1} max={100} step={1} value={quality}
+              onChange={setQuality} unit="%" />
+          )}
+          <ToggleRow label="Зациклить анимацию" on={loop} onChange={setLoop} />
         </div>
-        <div className="row">
-          <div>
-            <div className="row-label">Длительность (сек)</div>
-            <div className="row-hint">0 = до конца</div>
+
+        <div className="card">
+          <div className="card-header"><span className="card-title">Эффекты и тайминг</span></div>
+          <ToggleRow label="Ping-pong (вперёд + назад)" hint="Анимация играет вперёд затем в обратную сторону"
+            on={pingPong} onChange={setPingPong} />
+          <div className="row">
+            <div>
+              <div className="row-label">Начало (сек)</div>
+              <div className="row-hint">0 = с начала</div>
+            </div>
+            <input type="number" className="ios-input" min={0} value={startTime}
+              onChange={e => setStart(Number(e.target.value))} />
           </div>
-          <input type="number" className="ios-input" min={0} value={duration}
-            onChange={e => setDuration(Number(e.target.value))} />
+          <div className="row">
+            <div>
+              <div className="row-label">Длительность (сек)</div>
+              <div className="row-hint">0 = до конца</div>
+            </div>
+            <input type="number" className="ios-input" min={0} value={duration}
+              onChange={e => setDuration(Number(e.target.value))} />
+          </div>
+          <div className="row clickable video-adv-toggle" onClick={() => setAdvancedOpen(v => !v)}>
+            <span className="card-title">Расширенные</span>
+            <span className={`card-toggle ${advancedOpen ? 'open' : ''}`}>▼</span>
+          </div>
+          <div className={`card-content video-adv-content ${advancedOpen ? 'open' : ''}`}>
+            {fmt === 'GIF' && (
+              <SelectRow label="Дизеринг (dither)" value={dither} onChange={setDither}
+                options={DITHER_MODES} />
+            )}
+            {fmt === 'WebP' && (
+              <ToggleRow label="Оптимизировать (compression 6)" on={optimize} onChange={setOptimize} />
+            )}
+          </div>
         </div>
       </div>
 
@@ -213,9 +257,10 @@ export default function GifWebpTab({ settings }) {
 
       <ConvertFooter
         state={state} progress={progress} speed={speed} fps={fps} error={error}
-        onConvert={handleConvert} onReset={reset}
-        disabled={!file}
+        onConvert={handleConvert} onReset={state === 'running' ? cancel : reset}
+        disabled={!file || duration < 0 || startTime < 0 || gifFps < 5 || gifFps > 30}
       />
     </div>
   )
 }
+

@@ -16,7 +16,7 @@
     ],
     "resources": ["resources/ffmpeg.exe", "resources/ffprobe.exe"]
   },
-  "productName": "FFStudio",
+  "productName": "MediaKit",
   "mainBinaryName": "FFStudio",
   "version": "0.1.0",
   "identifier": "com.ffstudio.app",
@@ -28,15 +28,21 @@
         "label": "main",
         "fullscreen": false,
         "resizable": true,
-        "title": "FFStudio",
+        "title": "MediaKit",
         "width": 1000,
         "height": 680,
         "minWidth": 780,
-        "minHeight": 520
+        "minHeight": 520,
+        "decorations": true,
+        "transparent": false
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["**"]
+      }
     }
   }
 }

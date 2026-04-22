@@ -1,17 +1,23 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
-  useFile, useConvert, saveOutput,
+  useFile, useConvert, useTabState, saveOutputUnique,
   ToggleRow, ConvertFooter, CmdPreview, FileDropZone,
-  formatDuration,
+  formatDuration, PageHeader,
 } from './shared'
 
 export default function TrimTab({ settings }) {
   const { file, pickFile, loadFileInfo, clearFile } = useFile()
-  const { state, progress, speed, fps, error, run, reset } = useConvert()
+  const { state, progress, speed, fps, error, run, reset, cancel } = useConvert()
+  const { state: persistedTrim, patchState: patchTabState } = useTabState('trim', {
+    startTime: 0, endTime: 0, noReencode: true,
+  })
 
-  const [startTime, setStart] = useState(0)
-  const [endTime, setEnd]     = useState(0)
-  const [noReencode, setNoRe] = useState(true)
+  const [startTime, setStart] = useState(persistedTrim.startTime)
+  const [endTime, setEnd]     = useState(persistedTrim.endTime)
+  const [noReencode, setNoRe] = useState(persistedTrim.noReencode)
+  useEffect(() => {
+    patchTabState({ startTime, endTime, noReencode })
+  }, [startTime, endTime, noReencode])
 
   const duration = file?.info?.duration ?? 0
 
@@ -34,7 +40,12 @@ export default function TrimTab({ settings }) {
 
   const handleConvert = async () => {
     if (!file) return
-    const outPath = await saveOutput('output_trimmed.mp4', [{ name: 'MP4', extensions: ['mp4'] }])
+    const outPath = await saveOutputUnique({
+      defaultStem: 'trim',
+      extension: 'mp4',
+      filters: [{ name: 'MP4', extensions: ['mp4'] }],
+      targetDir: settings.outputDir || '',
+    })
     if (!outPath) return
     const trimArgs = [...ffArgs]
     run(file.path, outPath, trimArgs)
@@ -74,6 +85,7 @@ export default function TrimTab({ settings }) {
 
   return (
     <div className="content">
+
       <FileDropZone
         file={file}
         onPick={() => pickFile([{ name: 'Видео', extensions: ['mp4','mkv','avi','mov','webm'] }])}
@@ -118,9 +130,10 @@ export default function TrimTab({ settings }) {
 
       <ConvertFooter
         state={state} progress={progress} speed={speed} fps={fps} error={error}
-        onConvert={handleConvert} onReset={reset}
+        onConvert={handleConvert} onReset={state === 'running' ? cancel : reset}
         disabled={!file}
       />
     </div>
   )
 }
+

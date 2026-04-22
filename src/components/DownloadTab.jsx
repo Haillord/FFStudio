@@ -1,7 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { invoke } from "@tauri-apps/api/core"
 import { open } from "@tauri-apps/plugin-dialog"
-import { Chip, ToggleRow } from './shared'
+import { Chip, ToggleRow, formatUserError, useTabState, PageHeader } from './shared'
 
 const QUALITIES = [
   { label: 'Лучшее', value: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]' },
@@ -12,12 +12,19 @@ const QUALITIES = [
 ]
 
 export default function DownloadTab() {
-  const [url, setUrl] = useState("")
+  const { state: persistedDownload, patchState: patchTabState } = useTabState('download', {
+    url: '', quality: QUALITIES[0].value, savePath: '', openFolder: true,
+  })
+  const [url, setUrl] = useState(persistedDownload.url)
   const [log, setLog] = useState("")
   const [loading, setLoading] = useState(false)
-  const [quality, setQuality] = useState(QUALITIES[0].value)
-  const [savePath, setSavePath] = useState("")
-  const [openFolder, setOpenFolder] = useState(true)
+  const [quality, setQuality] = useState(persistedDownload.quality)
+  const [savePath, setSavePath] = useState(persistedDownload.savePath)
+  const [openFolder, setOpenFolder] = useState(persistedDownload.openFolder)
+
+  useEffect(() => {
+    patchTabState({ url, quality, savePath, openFolder })
+  }, [url, quality, savePath, openFolder])
 
   async function pickSaveFolder() {
     const selected = await open({
@@ -31,8 +38,13 @@ export default function DownloadTab() {
 
   async function handleDownload() {
     if (!url.trim()) return
+    const validUrl = /^https?:\/\/.+/i.test(url.trim())
+    if (!validUrl) {
+      setLog('Ошибка:\nНекорректная ссылка. Укажите полный URL, начиная с http:// или https://')
+      return
+    }
     setLoading(true)
-    setLog("🔄 Скачиваю...")
+    setLog("Скачиваю...")
 
     try {
       const result = await invoke("run_ytdlp", {
@@ -48,7 +60,7 @@ export default function DownloadTab() {
       }
 
     } catch (e) {
-      setLog(`❌ Ошибка:\n${e}`)
+      setLog(`Ошибка:\n${formatUserError(e, 'Не удалось скачать видео')}`)
     } finally {
       setLoading(false)
     }
@@ -56,6 +68,7 @@ export default function DownloadTab() {
 
   return (
     <div className="content">
+
       <div className="card">
         <div className="card-header">
           <span className="card-title">Ссылка на видео</span>
@@ -79,7 +92,7 @@ export default function DownloadTab() {
               disabled={loading || !url.trim()}
               style={{ minWidth: 140 }}
             >
-              {loading ? "⏳ Скачиваю..." : "⬇️ Скачать"}
+              {loading ? "Скачиваю..." : "Скачать"}
             </button>
           </div>
 
@@ -92,7 +105,7 @@ export default function DownloadTab() {
               fontSize: 12,
               color: 'var(--text-secondary)'
             }}>
-              📂 {savePath || "По умолчанию: Загрузки"}
+              {savePath || "По умолчанию: Загрузки"}
             </div>
             <button
               className="btn btn-secondary"
@@ -100,7 +113,7 @@ export default function DownloadTab() {
               disabled={loading}
               style={{ minWidth: 100 }}
             >
-              📁 Выбрать папку
+              Выбрать папку
             </button>
           </div>
         </div>
@@ -164,3 +177,4 @@ export default function DownloadTab() {
     </div>
   )
 }
+

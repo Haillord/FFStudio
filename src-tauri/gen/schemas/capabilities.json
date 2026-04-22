@@ -1,1 +1,1 @@
-{"default":{"identifier":"default","description":"Full permissions for FFStudio Development","local":true,"windows":["main"],"permissions":["core:default","dialog:default","fs:default","fs:read-all","fs:write-all","fs:scope-home-recursive","fs:scope-temp-recursive","shell:default"]}}
+{"default":{"identifier":"default","description":"Full permissions for MediaKit development","local":true,"windows":["main"],"permissions":["core:default","dialog:default","fs:default","fs:read-all","fs:write-all","fs:scope-home-recursive","fs:scope-temp-recursive","shell:default"]}}

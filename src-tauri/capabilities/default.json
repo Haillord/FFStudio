@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Full permissions for FFStudio Development",
+  "description": "Full permissions for MediaKit development",
   "windows": ["main"],
   "permissions": [
     "core:default",
@@ -12,5 +12,14 @@
     "fs:scope-home-recursive",
     "fs:scope-temp-recursive",
     "shell:default"
+  ],
+  "commands": [
+    "check_whisper",
+    "install_whisper",
+    "run_whisper",
+    "burn_subtitles",
+    "check_audiocraft",
+    "install_audiocraft",
+    "run_audiocraft"
   ]
 }
