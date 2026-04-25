@@ -65,7 +65,7 @@
 ## Скриншоты
 
 <details>
-  <summary><b>📸 Открыть галерею (выдвигающиеся блоки)</b></summary>
+  <summary><b>📸 Открыть галерею</b></summary>
   <br/>
 
   <details>
